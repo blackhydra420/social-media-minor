@@ -1,0 +1,41 @@
+h4{
+    background-color:#1A5E61;
+    color:white;
+    text-align: center;
+    margin-bottom:0px;
+
+}
+.row{
+    height:100%;
+    border:1px solid black;
+}
+.no-pad{
+    padding:2px;
+}
+.topic-heading{
+    padding:15px 0px;
+}
+ul{
+    padding-left:5px;
+}
+.friend-list li{
+    font-size:20px;
+    padding:15px 5px;
+    background-color:#F0F8FF;
+    border-bottom:1px solid black;
+    border-right:1px solid black;
+    border-left: 1px solid black;
+}
+.chat li{
+    width:auto;
+    max-width:33%;
+    background-color:#d2f8d2;
+    margin:10px;
+    border-radius:10px;
+    padding:5px 7px;
+}
+.message-sending{
+    position: fixed;
+    bottom:0px;
+    width:100%;
+  }

@@ -44,3 +44,7 @@ body{
 #login:hover{
     background-color: blueviolet;
 }
+.main_page{
+    text-align: center;
+    display: none;
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/front.css">
+    <title>ChatBox</title>
+</head>
+<body>
+    <!-- Login form -->
+    <div class="container-fluid" style="height: 100vh; display: flex; flex-direction: column; justify-content: center;">
+      <div class="container shadow-lg rounded" style="width: 500px; padding: 20px;">
+          <h1>Login</h1>
+          <form>
+              <div class="form-group">
+                <label for="user_email">Email address</label>
+                <input type="email" class="form-control" id="user_email" aria-describedby="emailHelp" placeholder="Enter email">
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+              </div>
+              <div class="form-group">
+                <label for="user_pass">Password</label>
+                <input type="password" class="form-control" id="user_pass" placeholder="Password">
+              </div>
+              <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+      </div>
+    </div>
+
+    <div class="logout">
+        <button class="btn btn-primary" id="logout" onclick="logout()">logout</button>
+    </div>
+
+    <!-- main chatbox -->
+    <div class='container' id="chatbox">
+      <div class="row">
+          <div class='col-sm-4 no-pad'>
+              <h4 class="topic-heading">Your info</h4>
+              <ul style="list-style: none;" class="friend-list">
+                  <li>Soham Nathani</li>
+                  <li>Prince Kushwaha</li>
+                  <li>Anand Sharma</li>
+                  <li>Dev Singh</li>
+                  <li>Varun Shrivastava</li>
+              </ul>
+          </div>
+          <div class='col-sm-8 no-pad'style="border-left:1px solid black;">
+              <h4 class='topic-heading'>Name of the person</h4>
+              <ul style="list-style: none;" class="chat">
+                  <li>Haa be</li>
+                  <li>Kya be</li>
+                  <li>Teri To</li>
+                  <li>toto</li>
+                  <li>toto nhi tota</li>
+                  <li>tu mota</li>
+                  <li>tu mota tera baap mota teri maa moti tera khandan mota</li>
+              </ul>
+              <form action="" class="message-sending">
+                      <input style="min-width:95%" id="m"  autocomplete="off" required/>
+                      <button class="btn btn-primary">Send</button>
+                  </form>
+          </div>
+
+      </div>
+
+  </div>
+</body>
+
+<!-- bootstrap js libraries -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-analytics.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-firestore.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBVvwZSyn23XyJXHT1hvsghCpiphegoqrQ",
+    authDomain: "social-media-31bce.firebaseapp.com",
+    databaseURL: "https://social-media-31bce.firebaseio.com",
+    projectId: "social-media-31bce",
+    storageBucket: "social-media-31bce.appspot.com",
+    messagingSenderId: "308617471624",
+    appId: "1:308617471624:web:5865e63339515ea0d6613d",
+    measurementId: "G-MTELXP8MF4"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
+
+<!-- authorization script -->
+<script src="assets/scripts/auth.js"></script>
+</html>

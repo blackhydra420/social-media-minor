@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1>User loggedin</h1>
+</body>
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-analytics.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.2.1/firebase-firestore.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBVvwZSyn23XyJXHT1hvsghCpiphegoqrQ",
+    authDomain: "social-media-31bce.firebaseapp.com",
+    databaseURL: "https://social-media-31bce.firebaseio.com",
+    projectId: "social-media-31bce",
+    storageBucket: "social-media-31bce.appspot.com",
+    messagingSenderId: "308617471624",
+    appId: "1:308617471624:web:5865e63339515ea0d6613d",
+    measurementId: "G-MTELXP8MF4"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
+<script>
+    var user = firebase.auth().currentUser;
+
+      if (user) {
+        // User is signed in.
+        alert("user loggedIn");
+      } else {
+        // No user is signed in.
+        alert("user not loggedIn");
+      }
+</script>
+</html>
