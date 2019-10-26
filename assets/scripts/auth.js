@@ -1,7 +1,9 @@
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       console.log("user logged in");
-      console.log(user);
+      
+      const userEmail = user.email;
+
     } else {
       console.log("user logged out");
     }
@@ -15,6 +17,7 @@ function logout(){
       });
 }
 
+//login form logic
 const loginForm = document.getElementById("loginForm");
 
 loginForm.addEventListener('submit', (e) =>{
@@ -32,4 +35,31 @@ loginForm.addEventListener('submit', (e) =>{
         // ...
         alert(error.message);
     });
+});
+
+//signup form logic
+const signupForm = document.getElementById("signupForm");
+
+signupForm.addEventListener('submit', (e) =>{
+    e.preventDefault();
+
+    const createEmail = document.getElementById("user_create_email").value;
+    const createPassword = document.getElementById("user_create_pass").value;
+    const cpassword = document.getElementById("user_con_pass").value;
+
+    if(cpassword == createPassword){
+
+      firebase.auth().createUserWithEmailAndPassword(createEmail, createPassword).then(() =>{
+          signupForm.reset();
+          console.log("signup");
+      }).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          // ...
+          alert(error.message);
+      });
+    } else {
+      alert("password do not match");
+    }
 });
