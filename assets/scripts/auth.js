@@ -5,7 +5,27 @@ firebase.auth().onAuthStateChanged(function(user) {
       console.log("user logged in");
       
       var userEmail = user.email;
-
+      document.getElementById("user-info").innerHTML = user.email;//Setting user name in profile
+      //Friend List
+      var friendref = db.collection("users").doc(user.uid);
+      friendref.get().then(function(doc){
+        if (doc.exists) {
+          $('.friend-list').empty();
+          if((doc.data()).friends){
+            friends = (doc.data()).friends;
+            friends.forEach(function(friend){
+              $('.friend-list').append('<li>'+ friend.friend_id + '</li>')
+            })
+          }
+          
+      } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+      }
+  }).catch(function(error) {
+      console.log("Error getting document:", error);
+  });
+    //If user is logged out  
     } else {
       console.log("user logged out");
     }
@@ -14,6 +34,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 function logout(){
     firebase.auth().signOut().then(function() {
         // Sign-out successful.
+
       }).catch(function(error) {
         // An error happened.
       });
@@ -30,6 +51,8 @@ loginForm.addEventListener('submit', (e) =>{
 
     firebase.auth().signInWithEmailAndPassword(email, password).then(() =>{
         loginForm.reset();
+        
+        
     }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
