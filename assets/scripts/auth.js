@@ -1,8 +1,10 @@
+const db = firebase.firestore();
+
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       console.log("user logged in");
       
-      const userEmail = user.email;
+      var userEmail = user.email;
 
     } else {
       console.log("user logged out");
@@ -49,9 +51,19 @@ signupForm.addEventListener('submit', (e) =>{
 
     if(cpassword == createPassword){
 
-      firebase.auth().createUserWithEmailAndPassword(createEmail, createPassword).then(() =>{
-          signupForm.reset();
-          console.log("signup");
+      firebase.auth().createUserWithEmailAndPassword(createEmail, createPassword).then((cred) =>{
+          // Add a new document in collection "users"
+            db.collection("users").doc(cred.user.uid).set({
+              id: cred.user.email
+            })
+            .then(function() {
+              console.log("Document successfully written!");
+              signupForm.reset();
+              console.log("signedup");
+            })
+            .catch(function(error) {
+              console.error("Error writing document: ", error);
+            });
       }).catch(function(error) {
           // Handle Errors here.
           var errorCode = error.code;
