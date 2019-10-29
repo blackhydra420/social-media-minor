@@ -5,6 +5,7 @@ var friendId = "";
 var isAbleToSend = false;
 var room_id;
 let loginContainer = document.getElementById("loginContainer");
+let signupContainer = document.getElementById("signupContainer");
 let afterLogin = document.getElementById("after_login");
 const mainBox = document.getElementById("main_box");
 
@@ -12,6 +13,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       console.log("user logged in");
       loginContainer.style.display = "none";
+      signupContainer.style.display = 'none';
       afterLogin.style.display = "flex";
       
       userEmail = user.email;
