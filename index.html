@@ -7,11 +7,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/front.css">
-    <title>ChatBox</title>
+    <script src="https://kit.fontawesome.com/cdf493be5b.js" crossorigin="anonymous"></script>
+    <title>SapChat</title>
 </head>
 <body>
     <!-- Login form -->
-    <div id="loginContainer" class="container-fluid" style="height: 100vh; display: flex; flex-direction: column; justify-content: center;">
+    <div id="loginContainer" class="container-fluid" style="height: 100vh; display: none; flex-direction: column; justify-content: center;">
       <div class="container shadow-lg rounded" style="width: 500px; padding: 20px;">
           <h1>Login</h1>
           <form id="loginForm">
@@ -54,39 +55,82 @@
         </div>
       </div>
 
-    <div class="logout">
-        <button class="btn btn-primary" id="logout" onclick="logout()">logout</button>
-    </div>
+    
+     <!-- notification panel -->   
+      <div class="shadow-lg" id="ntf_panel" style="display: none; position: absolute; top: 100px; right: 60px; z-index: 99999; background-color: azure;">
+        <ul style="list-style: none; max-height: 60vh; overflow: auto;" class="notifications" id="ntf_panel_ul">
+          <li>prince kushwaha <button class="btn btn-primary"><i class="fas fa-check"></i></button> <button class="btn btn-danger"><i class="fas fa-times"></i></button> </li>
+          <li>anand <div><button class="btn btn-primary"><i class="fas fa-check"></i></button> <button class="btn btn-danger"><i class="fas fa-times"></i></button></div></li>
+          <li>soham <div><button class="btn btn-primary"><i class="fas fa-check"></i></button> <button class="btn btn-danger"><i class="fas fa-times"></i></button></div></li>
+        </ul>
+      </div>
+      
+      <!-- <button onclick="sendFrndRequest()">send request</button>
+      <button onclick="deleteFrndRequest('eh0SdFphcDJGvVRKUD8K')">delete request</button> -->
 
     <!-- main chatbox -->
-    <div class='container' id="chatbox">
-      <div class="row">
-          <div class='col-sm-4 no-pad'>
-              <h4 class="topic-heading" id="user-info">Your info</h4>
-              <ul style="list-style: none;" class="friend-list">
-                  
-              </ul>
-          </div>
-          <div class='col-sm-8 no-pad'style="border-left:1px solid black;">
-              <h4 class='topic-heading'>Name of the person</h4>
-              <ul style="list-style: none;" class="chat">
-                  <li>Haa be</li>
-                  <li>Kya be</li>
-                  <li>Teri To</li>
-                  <li>toto</li>
-                  <li>toto nhi tota</li>
-                  <li>tu mota</li>
-                  <li>tu mota tera baap mota teri maa moti tera khandan mota</li>
-              </ul>
-              <form action="" class="message-sending">
-                      <input style="min-width:95%" id="m"  autocomplete="off" required/>
-                      <button class="btn btn-primary">Send</button>
-                  </form>
-          </div>
-
+    <div style="display: none; flex-direction: column; justify-content: center; height: 100vh;" id="after_login">
+      <div class="logout" style="widows: 50px; height: 50%; margin: 5px; position: absolute; right: 10px; top: 40px;">
+        <button class="btn btn-danger" style="border-radius: 50%;" id="logout"><i class="fas fa-sign-out-alt info-buttons"></i></button>
       </div>
 
-  </div>
+      <div class="logout" style="widows: 50px; height: 50%; margin: 5px; position: absolute; right: 10px; top: 90px;">
+        <button class="btn btn-warning" style="border-radius: 50%;" id="notification" onclick="load_ntf()"><i id="bell" class="far fa-bell info-buttons"></i></button>
+      </div>
+      <div class='container shadow-lg' id="chatbox" style="height: 90vh;">
+        <div class="row">
+            <div class='col-sm-4 no-pad'>
+                <div><h4 class="topic-heading" id="user-info">Your info</h4></div>
+
+                <!-- search bar -->
+                <form class="search" id="searchBar">
+                    <input type="text" placeholder="Enter email id of the user" name="search" id="searchInput">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </form>
+
+                <!-- friendlist -->
+                <ul style="list-style: none;" class="friend-list" id="firend_list">
+                    
+                </ul>
+            </div>
+            <div class='col-sm-8 no-pad' style="background-color: #f2eee5;" id="main_box">
+
+              <!-- <h4 class="topic-heading">Result</h4>
+              <div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);">
+                  <div class="card shadow" style="width: 18rem; margin: auto;">
+                      <img src="assets/images/default-profile.png" class="card-img-top" alt="...">
+                      <div class="card-body">
+                        <h5 class="card-title">prince@gmail.com</h5>
+                        <button class="btn btn-info disabled">send request</button>
+                      </div>
+                    </div>
+              </div> -->
+
+              <!-- <h4 class="topic-heading">Result</h4>
+              <div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);">
+                  <h3 style="text-align: center;"><i class="fa fa-search"></i> no search result</h3>
+              </div> -->
+
+                <h4 class='topic-heading' id="current-chatter">Name of the person</h4>
+                <ul style="list-style: none;" class="chat">
+                    <li>Hi..</li>
+                    <li>Hello</li>
+                    <li>How are you?</li>
+                    <li>I'm fine wt abt u?</li>
+                    <li>I'm fine as well</li>
+                    <li>cya</li>
+                    <li>later dude</li>
+                </ul>
+                <form class="message-sending">
+                    <input style="width: calc(100% - 29px);" id="m"  autocomplete="off" required/>
+                  <button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+
+        </div>
+
+      </div>
+    </div>
 </body>
 
 <!-- bootstrap js libraries -->
@@ -124,6 +168,6 @@
 <!-- authorization script -->
 <script src="assets/scripts/auth.js"></script>
 
-<!-- other scripts -->
+<!-- DOM manipulation scripts -->
 <script src="assets/scripts/index.js"></script>
 </html>

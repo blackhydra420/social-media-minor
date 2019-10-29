@@ -1,3 +1,4 @@
+
 let login = document.getElementById("loginContainer");
 let signup = document.getElementById("signupContainer");
 
@@ -9,4 +10,19 @@ function loadForm(){
     signup.style.display = "none";
     login.style.display = "flex";
   }
+}
+
+let ntcPanel = document.getElementById("ntf_panel");
+let ntfButton = document.getElementById("notification");
+
+function load_ntf(){
+  console.log("clicked");
+  if(ntcPanel.style.display == "none"){
+    ntcPanel.style.display = "block";
+  } else {
+    ntcPanel.style.display = "none";
+  }
+  let bell = document.getElementById("bell");
+  bell.removeAttribute('class');
+  bell.setAttribute('class', 'far fa-bell');
 }

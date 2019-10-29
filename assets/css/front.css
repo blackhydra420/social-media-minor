@@ -5,26 +5,36 @@ h4{
     margin-bottom:0px;
 
 }
+#result_user{
+    color: #1A5E61;
+    background-color: transparent;
+}
 .row{
     height:100%;
-    border:1px solid black;
 }
 .no-pad{
-    padding:2px;
+    padding:0;
 }
 .topic-heading{
     padding:15px 0px;
+    border-left: 1px solid whitesmoke;
 }
 ul{
-    padding-left:5px;
+    padding: 0;
 }
 .friend-list li{
     font-size:20px;
-    padding:15px 5px;
-    background-color:#F0F8FF;
-    border-bottom:1px solid black;
-    border-right:1px solid black;
-    border-left: 1px solid black;
+    padding:15px 15px;
+    margin: 0;
+    border-top: 1px solid #f2f2f2;
+}
+.friend-list li:hover{
+    background-color: #e9ebeb;
+    cursor: pointer;
+}
+.clicked{
+    background-color: #e9ebeb;
+    border-left: 2px solid #1A5E61;
 }
 .chat li{
     width:auto;
@@ -34,8 +44,29 @@ ul{
     border-radius:10px;
     padding:5px 7px;
 }
+
+.notifications{
+    padding: 15px;
+    margin: 0;
+}
+.notifications>li{
+    border-bottom: 1px solid #e9ebeb;
+    padding: 5px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+.notifications>li>div{
+    margin-left: 10px;
+}
+.notifications>li:hover{
+    background-color: #e9ebeb;
+    cursor: pointer;
+}
+
 .message-sending{
-    position: fixed;
-    bottom:0px;
-    width:100%;
-  }
+    display: flex;
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+}
