@@ -30,9 +30,13 @@ firebase.auth().onAuthStateChanged(function(user) {
             })
           }
           var friend_id_li = $('.friend-list > li');
+          var $li = $('.friend-list li').click(function() {
+            $li.removeClass('clicked');
+            $(this).addClass('clicked');
+          });
           for(var i =0; i<friend_id_li.length;i++){
                    friend_id_li[i].addEventListener('click', function(){
-                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; display: flex;flex-direction:column; ; max-height: calc(100% - 58px);overflow:auto" class="chat">                         </ul><form class="message-sending"><input style="width: calc(100% - 29px);" id="m"  autocomplete="off" required/><button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button></form>';
+                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; max-height: 75vh; overflow:auto" class="chat">                         </ul><form class="message-sending"><input style="width: calc(100% - 29px);" id="m"  autocomplete="off" required/><button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button></form>';
                      let inner_friend = this.innerHTML;
                      friendref.get().then(function(doc){
                        if(doc.data().friends){
@@ -75,10 +79,11 @@ firebase.auth().onAuthStateChanged(function(user) {
                                   if (userEmail != doc.data().sender){
                                     my_chat_class = '';
                                   }
-                                    $('.chat').append('<li class='+ my_chat_class +'>' + doc.data().message + '</li>')
+                                    $('.chat').append('<li class='+ my_chat_class +'>' + doc.data().message + '</li>');
+                                    
                                 });
-                                
                             });
+                            
                            }
                          })
                        }
