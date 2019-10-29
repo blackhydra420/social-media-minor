@@ -53,6 +53,20 @@ firebase.auth().onAuthStateChanged(function(user) {
                         //         console.log(doc.data());
                         //     });
                         // });
+                        $(".message-sending").submit(function(e){
+                          //console.log($('#m').val());
+                          e.preventDefault();
+                        var message_val = $("#m").val();
+                        var sender_id = $("#user-info")[0].innerHTML;
+                        var document_id = (Date.now()).toString();
+                        //console.log(message_val + '' + sender_id + '' + document_id);  
+                        db.collection("roomid").doc(room_id).collection("messages").doc(document_id).set({
+                        sender: sender_id,
+                        message: message_val
+                         });
+                        
+                         $('#m').val(""); 
+                          });
                         db.collection("roomid").doc(room_id).collection("messages")
                             .onSnapshot(function(querySnapshot) {
                                 $('.chat').empty();
