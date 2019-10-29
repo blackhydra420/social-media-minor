@@ -3,9 +3,10 @@ var userEmail = "";
 var userDocId = "";
 var friendId = "";
 var isAbleToSend = false;
-
+var room_id;
 let loginContainer = document.getElementById("loginContainer");
 let afterLogin = document.getElementById("after_login");
+const mainBox = document.getElementById("main_box");
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
@@ -28,7 +29,53 @@ firebase.auth().onAuthStateChanged(function(user) {
               $('.friend-list').append('<li>'+ friend.friend_id + '</li>')
             })
           }
-      } else {
+          var friend_id_li = $('.friend-list > li');
+          for(var i =0; i<friend_id_li.length;i++){
+                   friend_id_li[i].addEventListener('click', function(){
+                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; display: flex;flex-direction:column; ; max-height: calc(100% - 58px);overflow:auto" class="chat">                         </ul><form class="message-sending"><input style="width: calc(100% - 29px);" id="m"  autocomplete="off" required/><button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button></form>';
+                     let inner_friend = this.innerHTML;
+                     friendref.get().then(function(doc){
+                       if(doc.data().friends){
+                         friends = doc.data().friends;
+                         friends.forEach(function(friend){
+                           //console.log(inner_friend);
+                           //console.log(friend.friend_id);
+                           if (inner_friend==friend.friend_id){
+                              room_id = friend.roomid;
+                              console.log(room_id);
+                              document.getElementById("current-chatter").innerHTML = inner_friend;
+                              $('.chat').empty();
+                        //     var messageref = db.collection("roomid").doc(room_id).collection("messages");
+                        //     messageref.get().then(function(querySnapshot) {
+                        //     querySnapshot.forEach(function(doc) {
+                              
+                        //           $('.chat').append('<li>'+ doc.data().sender +":"+ doc.data().message + '</li>')
+                        //         console.log(doc.data());
+                        //     });
+                        // });
+                        db.collection("roomid").doc(room_id).collection("messages")
+                            .onSnapshot(function(querySnapshot) {
+                                $('.chat').empty();
+                                querySnapshot.forEach(function(doc) {
+                                  let my_chat_class = 'my_chat';
+                                  if (userEmail != doc.data().sender){
+                                    my_chat_class = '';
+                                  }
+                                    $('.chat').append('<li class='+ my_chat_class +'>' + doc.data().message + '</li>')
+                                });
+                                
+                            });
+                           }
+                         })
+                       }
+                     })
+                     
+                  
+                            //$('.chat').append('<li>'+ message.sender +":"+ message.message+ '</li>')
+  
+                   });
+      }
+     } else {
           // doc.data() will be undefined in this case
           $('.friend-list').append('<li> You have no friends </li>')
       }
@@ -166,6 +213,15 @@ function addFrnd(val){
             }).catch(function(error){
               console.log(error);
             });
+            db.collection("roomid").doc(roomid).set({
+              roomd_id_created:true
+            })
+            .then(function() {
+              console.log("Room Id created");
+          })
+          .catch(function(error) {
+              console.error("Error writing document: ", error);
+          });
             console.log("Document data:", doc.data());
         } else {
             // doc.data() will be undefined in this case
@@ -248,7 +304,7 @@ signupForm.addEventListener('submit', (e) =>{
 });
 
 
-const mainBox = document.getElementById("main_box");
+
 
 //search bar logic
 const seachBar = document.getElementById("searchBar");

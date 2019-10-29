@@ -37,8 +37,9 @@ ul{
     border-left: 2px solid #1A5E61;
 }
 .chat li{
-    width:auto;
-    max-width:33%;
+    
+    max-width:35%; /* limit width */
+    word-break:break-all;
     background-color:#d2f8d2;
     margin:10px;
     border-radius:10px;
@@ -69,4 +70,9 @@ ul{
     width: 100%;
     position: absolute;
     bottom: 0px;
+}
+.my_chat{
+    background-color: white!important;
+    
+    margin-left:65% !important;
 }
