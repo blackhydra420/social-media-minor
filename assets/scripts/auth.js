@@ -11,7 +11,7 @@ const mainBox = document.getElementById("main_box");
 
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
-      console.log("user logged in");
+      //console.log("user logged in");
       loginContainer.style.display = "none";
       signupContainer.style.display = 'none';
       afterLogin.style.display = "flex";
@@ -38,7 +38,35 @@ firebase.auth().onAuthStateChanged(function(user) {
           });
           for(var i =0; i<friend_id_li.length;i++){
                    friend_id_li[i].addEventListener('click', function(){
-                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; max-height: 75vh; overflow:auto" class="chat">                         </ul><form class="message-sending"><input style="width: calc(100% - 29px);" id="m"  autocomplete="off" required/><button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button></form>';
+                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; max-height: 75vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><input style="width: calc(100% - 29px);" id="m"  autocomplete="off" required/><button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button></form>';
+
+                     //auto scroll code start
+
+                     // Select the node that will be observed for mutations
+                      const targetNode = document.getElementById('myChat');
+
+                      // Options for the observer (which mutations to observe)
+                      const config = { attributes: true, childList: true, subtree: true };
+
+                      // Callback function to execute when mutations are observed
+                      const callback = function(mutationsList, observer) {
+                          for(let mutation of mutationsList) {
+                              if (mutation.type === 'childList') {
+                                  // console.log('A child node has been added or removed.');
+                                  let scrolly = targetNode.scrollHeight;
+                                  targetNode.scrollTo(0, scrolly);
+                              }
+                          }
+                      };
+
+                      // Create an observer instance linked to the callback function
+                      const observer = new MutationObserver(callback);
+
+                      // Start observing the target node for configured mutations
+                      observer.observe(targetNode, config);
+
+                      //auto scroll code end
+
                      let inner_friend = this.innerHTML;
                      friendref.get().then(function(doc){
                        if(doc.data().friends){
@@ -48,7 +76,7 @@ firebase.auth().onAuthStateChanged(function(user) {
                            //console.log(friend.friend_id);
                            if (inner_friend==friend.friend_id){
                               room_id = friend.roomid;
-                              console.log(room_id);
+                              //console.log(room_id);
                               document.getElementById("current-chatter").innerHTML = inner_friend;
                               $('.chat').empty();
                         //     var messageref = db.collection("roomid").doc(room_id).collection("messages");
@@ -83,15 +111,14 @@ firebase.auth().onAuthStateChanged(function(user) {
                                   }
                                     $('.chat').append('<li class='+ my_chat_class +'>' + doc.data().message + '</li>');
                                     
+                                    
                                 });
                             });
                             
                            }
-                         })
+                         });
                        }
-                     })
-                     
-                  
+                     });
                             //$('.chat').append('<li>'+ message.sender +":"+ message.message+ '</li>')
   
                    });
@@ -107,7 +134,7 @@ firebase.auth().onAuthStateChanged(function(user) {
       .onSnapshot(function(querySnapshot) {
         let ntfPanelUl = document.getElementById("ntf_panel_ul");
           if(querySnapshot.empty){
-            console.log('No friend requests');
+            //console.log('No friend requests');
             ntfPanelUl.innerHTML = '<li>No friend request</li>';
           } else {
             ntfPanelUl.innerHTML = "";
@@ -146,18 +173,19 @@ firebase.auth().onAuthStateChanged(function(user) {
                 bell.removeAttribute('class');
                 bell.setAttribute('class', 'fas fa-bell');
             })
-            console.log("done");
+            //console.log("done");
           }
     });
 
     //If user is logged out  
     } else {
-      console.log("user logged out");
+      //console.log("user logged out");
       loginContainer.style.display = "flex";
       afterLogin.style.display = "none";
     }
   });
 
+//logout logic
 const logOut = document.getElementById('logout');
 
 logOut.addEventListener('click', (e) =>{
@@ -165,27 +193,22 @@ logOut.addEventListener('click', (e) =>{
 
   firebase.auth().signOut().then(function() {
     // Sign-out successful.
+    userEmail = "";
+    userDocId = "";
+    friendId = "";
+    isAbleToSend = false;
+    room_id = "";
+
+    mainBox.innerHTML = "";
+
+    document.getElementById("ntf_panel").style.display = "none";
+
+    observer.disconnect();
 
   }).catch(function(error) {
     // An error happened.
   });
 });
-
-
-function sendFrndRequest(){
-  db.collection("friendRequests").doc().set({
-    receiver: "sG48OJNUcRRQzXS1sFo5TTsfJp72",
-    sender: "iRpaNYmHgRPTTjAuqOmbPNPtTtP2",
-    roomid: "I am god",
-    sender_id: "me too"
-  })
-  .then(function() {
-    console.log("Document successfully written!");
-  })
-  .catch(function(error) {
-    console.error("Error writing document: ", error);
-  });
-}
 
 //function for addind friend to friend list
 function addFrnd(val){
@@ -209,11 +232,11 @@ function addFrnd(val){
                 db.collection("users").doc(receiver).update({
                   friends: friendsArr
                 }).then(() =>{
-                  console.log("successfully friend added");
+                  //console.log("successfully friend added");
                 });
               }
             }).catch(function(error){
-              console.log(error);
+              //console.log(error);
             });
 
           //updating friend on sender side
@@ -228,39 +251,39 @@ function addFrnd(val){
                 db.collection("users").doc(sender).update({
                   friends: friendsArr
                 }).then(() =>{
-                  console.log("successfully friend added");
+                  //console.log("successfully friend added");
                 });
               }
             }).catch(function(error){
-              console.log(error);
+              //console.log(error);
             });
             db.collection("roomid").doc(roomid).set({
               roomd_id_created:true
             })
             .then(function() {
-              console.log("Room Id created");
+              //console.log("Room Id created");
           })
           .catch(function(error) {
-              console.error("Error writing document: ", error);
+              //console.error("Error writing document: ", error);
           });
-            console.log("Document data:", doc.data());
+            //console.log("Document data:", doc.data());
         } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
+            //console.log("No such document!");
         }
     }).then(() =>{
       deleteFrndRequest(val);
     }).catch(function(error) {
-        console.log("Error getting document:", error);
+        //console.log("Error getting document:", error);
     });
 }
 
 //function for deleting requests
 function deleteFrndRequest(val){
   db.collection("friendRequests").doc(val).delete().then(function() {
-      console.log("Document successfully deleted!");
+      //console.log("Document successfully deleted!");
   }).catch(function(error) {
-      console.error("Error removing document: ", error);
+      //console.error("Error removing document: ", error);
   });
 }
 
@@ -305,12 +328,12 @@ signupForm.addEventListener('submit', (e) =>{
               friends: []
             })
             .then(function() {
-              console.log("Document successfully written!");
+              //console.log("Document successfully written!");
               signupForm.reset();
-              console.log("signedup");
+              //console.log("signedup");
             })
             .catch(function(error) {
-              console.error("Error writing document: ", error);
+              //console.error("Error writing document: ", error);
             });
       }).catch(function(error) {
           // Handle Errors here.
@@ -334,18 +357,18 @@ seachBar.addEventListener('submit',(e) =>{
   e.preventDefault();
 
   let userSearch = document.getElementById("searchInput").value;
-  console.log(userSearch);
+  //console.log(userSearch);
 
   db.collection("users").where("id", "==", userSearch)
     .get()
     .then(function(querySnapshot) {
       if(querySnapshot.empty){
-        console.log("no search result");
+        //console.log("no search result");
         mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><h3 style="text-align: center;"><i class="fa fa-search"></i> no search result</h3></div>';
       } else {
         querySnapshot.forEach(function(doc) {
             // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, " => ", doc.data());
+            //console.log(doc.id, " => ", doc.data());
             friendId = doc.id;
             var buttonText = "";
             var isFriend = false;
@@ -358,15 +381,15 @@ seachBar.addEventListener('submit',(e) =>{
                 isRequested = false;
               } else {
                 isRequested = true;
-                console.log(isRequested);
+                //console.log(isRequested);
               }
             }).then(() =>{
             
-              console.log(isRequested);
+              //console.log(isRequested);
 
               if(isRequested){
                 buttonText = '<button id="sendRequest" class="btn btn-info disabled">Sent</button>';
-                console.log("request present");
+                //console.log("request present");
               } else {
 
                 var friends = doc.data().friends;
@@ -395,7 +418,7 @@ seachBar.addEventListener('submit',(e) =>{
       }
     })
     .catch(function(error) {
-        console.log("Error getting documents: ", error);
+        //console.log("Error getting documents: ", error);
     });
 });
 
@@ -418,14 +441,14 @@ function requestSend(){
           sender_id: userEmail
         })
         .then(function() {
-          console.log("Document successfully written!");
+          //console.log("Document successfully written!");
           sendRequest.setAttribute('class', 'btn btn-info disabled');
           sendRequest.innerHTML = 'Sent';
           isAbleToSend = false;
           something();
         })
         .catch(function(error) {
-          console.error("Error writing document: ", error);
+          //console.error("Error writing document: ", error);
         });
       } else {
         sendRequest.setAttribute('class', 'btn btn-info disabled');
