@@ -1,4 +1,5 @@
 const db = firebase.firestore();
+
 var userEmail = "";
 var userDocId = "";
 var friendId = "";
@@ -10,8 +11,14 @@ let afterLogin = document.getElementById("after_login");
 const mainBox = document.getElementById("main_box");
 
 firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
+  if (user) {
+    if(!user.emailVerified){
+      
+      document.getElementById("vContainer").display = "flex";
+    }
+    else{
       //console.log("user logged in");
+      document.getElementById("vContainer").display = "none";
       loginContainer.style.display = "none";
       signupContainer.style.display = 'none';
       afterLogin.style.display = "flex";
@@ -177,13 +184,48 @@ firebase.auth().onAuthStateChanged(function(user) {
           }
     });
 
+  }
     //If user is logged out  
-    } else {
+  } else {
       //console.log("user logged out");
       loginContainer.style.display = "flex";
       afterLogin.style.display = "none";
     }
   });
+
+//Verification logic
+let vButton = document.getElementById("vButton");
+let vText = document.getElementById("vText");
+
+vButton.addEventListener('click', (e) =>{
+  e.preventDefault();
+
+  user.sendEmailVerification().then(function() {
+    // Email sent.
+  }).catch(function(error) {
+    // An error happened.
+  });
+
+  vText.style.display = "block";
+  vButton.innerHTML = "Resend";
+  vButton.disabled = true;
+
+  var myTimeInterval = setInterval(myTimer, 1000);
+  var totalTime = 90;
+
+  function myTimer() {
+    totalTime = totalTime - 1;
+      if(totalTime < 1){
+        clearInterval(myTimeInterval);
+        vText.style.display = "none";
+        vButton.disabled = false;
+      }
+      var minute = parseInt(totalTime/60);
+      var second = totalTime%60;
+      
+    document.getElementById("vTimer").innerHTML = minute + ":" + second;
+  }
+});
 
 //logout logic
 const logOut = document.getElementById('logout');
@@ -296,9 +338,9 @@ loginForm.addEventListener('submit', (e) =>{
     const email = document.getElementById("user_email").value;
     const password = document.getElementById("user_pass").value;
 
-    firebase.auth().signInWithEmailAndPassword(email, password).then(() =>{
+    firebase.auth().signInWithEmailAndPassword(email, password).then((cred) =>{
         loginForm.reset();
-        
+        console.log(cred)
         
     }).catch(function(error) {
         // Handle Errors here.
@@ -316,6 +358,7 @@ signupForm.addEventListener('submit', (e) =>{
     e.preventDefault();
 
     const createEmail = document.getElementById("user_create_email").value;
+    const createdn = document.getElementById("user_create_dn").value;
     const createPassword = document.getElementById("user_create_pass").value;
     const cpassword = document.getElementById("user_con_pass").value;
 
@@ -323,6 +366,7 @@ signupForm.addEventListener('submit', (e) =>{
 
       firebase.auth().createUserWithEmailAndPassword(createEmail, createPassword).then((cred) =>{
           // Add a new document in collection "users"
+          cred.user.displayName = createdn;
             db.collection("users").doc(cred.user.uid).set({
               id: cred.user.email,
               friends: []
