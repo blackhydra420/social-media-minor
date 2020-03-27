@@ -13,8 +13,10 @@ const mainBox = document.getElementById("main_box");
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     if(!user.emailVerified){
+      //console.log(user)
       
       document.getElementById("vContainer").style.display = "flex";
+      emailVerfication(user);
     }
     else{
       //console.log("user logged in");
@@ -194,38 +196,40 @@ firebase.auth().onAuthStateChanged(function(user) {
   });
 
 //Verification logic
-let vButton = document.getElementById("vButton");
-let vText = document.getElementById("vText");
+function emailVerfication(user){
+  let vButton = document.getElementById("vButton");
+  let vText = document.getElementById("vText");
 
-vButton.addEventListener('click', (e) =>{
-  e.preventDefault();
+  vButton.addEventListener('click', (e) =>{
+    e.preventDefault();
 
-  user.sendEmailVerification().then(function() {
-    // Email sent.
-  }).catch(function(error) {
-    // An error happened.
+    user.sendEmailVerification().then(function() {
+      // Email sent.
+    }).catch(function(error) {
+      // An error happened.
+    });
+
+    vText.style.display = "block";
+    vButton.innerHTML = "Resend";
+    vButton.disabled = true;
+
+    var myTimeInterval = setInterval(myTimer, 1000);
+    var totalTime = 90;
+
+    function myTimer() {
+      totalTime = totalTime - 1;
+        if(totalTime < 1){
+          clearInterval(myTimeInterval);
+          vText.style.display = "none";
+          vButton.disabled = false;
+        }
+        var minute = parseInt(totalTime/60);
+        var second = totalTime%60;
+        
+      document.getElementById("vTimer").innerHTML = minute + ":" + second;
+    }
   });
-
-  vText.style.display = "block";
-  vButton.innerHTML = "Resend";
-  vButton.disabled = true;
-
-  var myTimeInterval = setInterval(myTimer, 1000);
-  var totalTime = 90;
-
-  function myTimer() {
-    totalTime = totalTime - 1;
-      if(totalTime < 1){
-        clearInterval(myTimeInterval);
-        vText.style.display = "none";
-        vButton.disabled = false;
-      }
-      var minute = parseInt(totalTime/60);
-      var second = totalTime%60;
-      
-    document.getElementById("vTimer").innerHTML = minute + ":" + second;
-  }
-});
+}
 
 //logout logic
 const logOut = document.getElementById('logout');
