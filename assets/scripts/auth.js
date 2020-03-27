@@ -14,11 +14,11 @@ firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     if(!user.emailVerified){
       
-      document.getElementById("vContainer").display = "flex";
+      document.getElementById("vContainer").style.display = "flex";
     }
     else{
       //console.log("user logged in");
-      document.getElementById("vContainer").display = "none";
+      document.getElementById("vContainer").style.display = "none";
       loginContainer.style.display = "none";
       signupContainer.style.display = 'none';
       afterLogin.style.display = "flex";
