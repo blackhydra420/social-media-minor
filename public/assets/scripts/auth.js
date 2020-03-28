@@ -13,8 +13,10 @@ const mainBox = document.getElementById("main_box");
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     if(!user.emailVerified){
-      //console.log(user)
-      
+      console.log(user);
+      console.log("Not verified");
+      loginContainer.style.display = "none";
+      signupContainer.style.display = 'none';
       document.getElementById("vContainer").style.display = "flex";
       emailVerfication(user);
     }
@@ -344,7 +346,7 @@ loginForm.addEventListener('submit', (e) =>{
 
     firebase.auth().signInWithEmailAndPassword(email, password).then((cred) =>{
         loginForm.reset();
-        console.log(cred)
+        //console.log(cred)
         
     }).catch(function(error) {
         // Handle Errors here.
