@@ -5,6 +5,7 @@ var userDocId = "";
 var friendId = "";
 var isAbleToSend = false;
 var room_id;
+
 let loginContainer = document.getElementById("loginContainer");
 let signupContainer = document.getElementById("signupContainer");
 let afterLogin = document.getElementById("after_login");
@@ -12,13 +13,14 @@ const mainBox = document.getElementById("main_box");
 
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
+    //checking if user's email is verified or not
     if(!user.emailVerified){
-      console.log(user);
-      console.log("Not verified");
+      //console.log(user);
+      //console.log("Not verified");
       loginContainer.style.display = "none";
       signupContainer.style.display = 'none';
       document.getElementById("vContainer").style.display = "flex";
-      emailVerfication(user);
+      emailVerification(user);
     }
     else{
       //console.log("user logged in");
@@ -28,19 +30,23 @@ firebase.auth().onAuthStateChanged(function(user) {
       afterLogin.style.display = "flex";
       
       userEmail = user.email;
-      document.getElementById("user-info").innerHTML = user.email;//Setting user name in profile
-      userDocId = user.uid;
+      document.getElementById("user-info").innerHTML = user.displayName;//Setting user name in profile
+      userDocId = user.displayName;
 
       //Friend List
-      var friendref = db.collection("users").doc(user.uid);
+      var friendref = db.collection("users").doc(user.displayName);
       friendref.onSnapshot(function(doc){
         if (doc.exists) {
           $('.friend-list').empty();
-          if((doc.data()).friends){
+          if((doc.data()).friends.length){
+            //console.log("freind exist");
             friends = (doc.data()).friends;
             friends.forEach(function(friend){
               $('.friend-list').append('<li>'+ friend.friend_id + '</li>')
             })
+          } else {
+            // doc.data() will be undefined in this case
+            $('.friend-list').append('<li> You have no friends </li>')
           }
           var friend_id_li = $('.friend-list > li');
           var $li = $('.friend-list li').click(function() {
@@ -117,7 +123,7 @@ firebase.auth().onAuthStateChanged(function(user) {
                                 $('.chat').empty();
                                 querySnapshot.forEach(function(doc) {
                                   let my_chat_class = 'my_chat';
-                                  if (userEmail != doc.data().sender){
+                                  if (user.displayName != doc.data().sender){
                                     my_chat_class = '';
                                   }
                                     $('.chat').append('<li class='+ my_chat_class +'>' + doc.data().message + '</li>');
@@ -134,10 +140,7 @@ firebase.auth().onAuthStateChanged(function(user) {
   
                    });
       }
-     } else {
-          // doc.data() will be undefined in this case
-          $('.friend-list').append('<li> You have no friends </li>')
-      }
+     } 
   });
     
   //notification logic
@@ -151,7 +154,7 @@ firebase.auth().onAuthStateChanged(function(user) {
             ntfPanelUl.innerHTML = "";
             querySnapshot.forEach(function(doc) {
 
-                var text = document.createTextNode(doc.data().sender_id);
+                var text = document.createTextNode(doc.data().sender);
                 var li = document.createElement("li");
 
                 //creating accept button
@@ -198,14 +201,23 @@ firebase.auth().onAuthStateChanged(function(user) {
   });
 
 //Verification logic
-function emailVerfication(user){
+
+var actionCodeSettings = {
+  // URL you want to redirect back to. The domain (www.example.com) for this
+  // URL must be whitelisted in the Firebase Console.
+  url: 'https://social-media-31bce.web.app/',
+  // This must be true.
+  handleCodeInApp: true,
+};
+
+function emailVerification(user){
   let vButton = document.getElementById("vButton");
   let vText = document.getElementById("vText");
 
   vButton.addEventListener('click', (e) =>{
     e.preventDefault();
 
-    user.sendEmailVerification().then(function() {
+    user.sendEmailVerification(actionCodeSettings).then(function() {
       // Email sent.
     }).catch(function(error) {
       // An error happened.
@@ -215,6 +227,7 @@ function emailVerfication(user){
     vButton.innerHTML = "Resend";
     vButton.disabled = true;
 
+    //setting timer for resend button
     var myTimeInterval = setInterval(myTimer, 1000);
     var totalTime = 90;
 
@@ -274,7 +287,7 @@ function addFrnd(val){
               if(doc.exists){
                 let friendsArr = doc.data().friends;
                 friendsArr.push({
-                  friend_id: sender_id,
+                  friend_id: sender,
                   roomid : roomid
                 });
                 db.collection("users").doc(receiver).update({
@@ -293,7 +306,7 @@ function addFrnd(val){
               if(doc.exists){
                 let friendsArr = doc.data().friends;
                 friendsArr.push({
-                  friend_id: userEmail,
+                  friend_id: receiver,
                   roomid : roomid
                 });
                 db.collection("users").doc(sender).update({
@@ -369,29 +382,51 @@ signupForm.addEventListener('submit', (e) =>{
     const cpassword = document.getElementById("user_con_pass").value;
 
     if(cpassword == createPassword){
+      let userNameRef = db.collection("users").doc(createdn);
 
-      firebase.auth().createUserWithEmailAndPassword(createEmail, createPassword).then((cred) =>{
-          // Add a new document in collection "users"
-          cred.user.displayName = createdn;
-            db.collection("users").doc(cred.user.uid).set({
-              id: cred.user.email,
-              friends: []
-            })
-            .then(function() {
-              //console.log("Document successfully written!");
-              signupForm.reset();
-              //console.log("signedup");
-            })
-            .catch(function(error) {
-              //console.error("Error writing document: ", error);
-            });
+      userNameRef.get().then(function(doc) {
+          if (doc.exists) {
+              alert("Username already exist");
+          } else {
+              // doc.data() will be undefined in this case
+              firebase.auth().createUserWithEmailAndPassword(createEmail, createPassword).then((cred) =>{
+                // Add a new document in collection "users"
+                  db.collection("users").doc(createdn).set({
+                    id: cred.user.email,
+                    username: createdn,
+                    friends: []
+                  })
+                  .then(function() {
+                    //console.log("Document successfully written!");
+                    //update the username of user
+                    cred.user.updateProfile({
+                      displayName: createdn
+                    }).then(function() {
+                      // Update successful.
+                      //console.log("username updated");
+                      //console.log(cred.user.displayName);
+                    }).catch(function(error) {
+                      // An error happened.
+                    });
+
+                    signupForm.reset();
+                    //console.log("signedup");
+                  })
+                  .catch(function(error) {
+                    //console.error("Error writing document: ", error);
+                  });
+              }).catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // ...
+                alert(error.message);
+              });
+          }
       }).catch(function(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          // ...
-          alert(error.message);
+          console.log("Error getting document:", error);
       });
+
     } else {
       alert("password do not match");
     }
@@ -413,64 +448,80 @@ seachBar.addEventListener('submit',(e) =>{
     .get()
     .then(function(querySnapshot) {
       if(querySnapshot.empty){
-        //console.log("no search result");
-        mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><h3 style="text-align: center;"><i class="fa fa-search"></i> no search result</h3></div>';
-      } else {
-        querySnapshot.forEach(function(doc) {
-            // doc.data() is never undefined for query doc snapshots
-            //console.log(doc.id, " => ", doc.data());
-            friendId = doc.id;
-            var buttonText = "";
-            var isFriend = false;
-            var isRequested = false;
-
-            db.collection("friendRequests").where("receiver", "==", friendId).where("sender", "==", userDocId)
-            .get()
-            .then(function(querySnapshot) {
-              if(querySnapshot.empty){
-                isRequested = false;
-              } else {
-                isRequested = true;
-                //console.log(isRequested);
-              }
-            }).then(() =>{
-            
-              //console.log(isRequested);
-
-              if(isRequested){
-                buttonText = '<button id="sendRequest" class="btn btn-info disabled">Sent</button>';
-                //console.log("request present");
-              } else {
-
-                var friends = doc.data().friends;
-                for(let i = 0; i<friends.length; i++ ){
-                  if(friends[i].friend_id == userEmail){
-                    buttonText = '<button id="sendRequest" class="btn btn-info disabled">Friends</button>';
-                    isFriend = true;
-                  }
-                }
-                if(!isFriend){
-                  if(friendId == userDocId){
-                    buttonText = "";
-                  } else {
-                    buttonText = '<button id="sendRequest" class="btn btn-info">send request</button>';
-                  }
-                }
-              }
-              mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><div class="card shadow" style="width: 18rem; margin: auto;"><img src="assets/images/default-profile.png" class="card-img-top" alt="..."><div class="card-body"><h5 class="card-title">'+ doc.data().id +'</h5>'+ buttonText +'</div></div></div>';
-
-              if(!isFriend && friendId != userDocId && !isRequested){
-                isAbleToSend = true;
-                requestSend();
-              }
-            });
+        db.collection("users").where("username", "==", userSearch)
+        .get()
+        .then(function(querySnapshot) {
+          if(querySnapshot.empty){
+            //console.log("no search result");
+            mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><h3 style="text-align: center;"><i class="fa fa-search"></i> no search result</h3></div>';
+          } else {
+            serachUser(querySnapshot);
+          }
+        })
+        .catch(function(error) {
+            //console.log("Error getting documents: ", error);
         });
+      } else {
+        serachUser(querySnapshot);
       }
     })
     .catch(function(error) {
         //console.log("Error getting documents: ", error);
     });
 });
+
+//user searching function
+function serachUser(querySnapshot){
+  querySnapshot.forEach(function(doc) {
+    // doc.data() is never undefined for query doc snapshots
+    //console.log(doc.id, " => ", doc.data());
+    friendId = doc.id;
+    var buttonText = "";
+    var isFriend = false;
+    var isRequested = false;
+
+    db.collection("friendRequests").where("receiver", "==", friendId).where("sender", "==", userDocId)
+    .get()
+    .then(function(querySnapshot) {
+      if(querySnapshot.empty){
+        isRequested = false;
+      } else {
+        isRequested = true;
+        //console.log(isRequested);
+      }
+    }).then(() =>{
+    
+      //console.log(isRequested);
+
+      if(isRequested){
+        buttonText = '<button id="sendRequest" class="btn btn-info disabled">Sent</button>';
+        //console.log("request present");
+      } else {
+
+        var friends = doc.data().friends;
+        for(let i = 0; i<friends.length; i++ ){
+          if(friends[i].friend_id == userDocId){
+            buttonText = '<button id="sendRequest" class="btn btn-info disabled">Friends</button>';
+            isFriend = true;
+          }
+        }
+        if(!isFriend){
+          if(friendId == userDocId){
+            buttonText = "";
+          } else {
+            buttonText = '<button id="sendRequest" class="btn btn-info">send request</button>';
+          }
+        }
+      }
+      mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><div class="card shadow" style="width: 18rem; margin: auto;"><img src="assets/images/default-profile.png" class="card-img-top" alt="..."><div class="card-body"><h6 class="card-title">Email: '+ doc.data().id +'</h6><h6 class="card-title">Username: '+ doc.data().username +'</h6>'+ buttonText +'</div></div></div>';
+
+      if(!isFriend && friendId != userDocId && !isRequested){
+        isAbleToSend = true;
+        requestSend();
+      }
+    });
+  });
+}
 
 //friend request sending function
 function requestSend(){
@@ -487,8 +538,7 @@ function requestSend(){
         db.collection("friendRequests").doc().set({
           receiver: friendId,
           sender: userDocId,
-          roomid: userDocId + friendId,
-          sender_id: userEmail
+          roomid: userDocId + friendId
         })
         .then(function() {
           //console.log("Document successfully written!");
