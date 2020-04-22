@@ -1,15 +1,37 @@
 const db = firebase.firestore();
+const storage = firebase.storage().ref();
 
 var userEmail = "";
 var userDocId = "";
 var friendId = "";
 var isAbleToSend = false;
 var room_id;
+const days = ["Sunday", "Monday", "Tueseday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 let loginContainer = document.getElementById("loginContainer");
 let signupContainer = document.getElementById("signupContainer");
 let afterLogin = document.getElementById("after_login");
 const mainBox = document.getElementById("main_box");
+
+const AlertBlur = document.getElementById('alertBlur');
+const AlertBox = document.getElementById('alertBox');
+
+function renderAlert(message){
+  document.getElementById('alertBody').innerHTML = message;
+
+  AlertBlur.style.display = 'block';
+  AlertBox.style.display = 'block';
+}
+
+const AlertBtn = document.getElementById('alertButton');
+
+AlertBtn.addEventListener('click', (e) =>{
+  e.preventDefault();
+
+  AlertBlur.style.display = 'none';
+  AlertBox.style.display = 'none';
+});
 
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
@@ -35,6 +57,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 
       //Friend List
       var friendref = db.collection("users").doc(user.displayName);
+      
       friendref.onSnapshot(function(doc){
         if (doc.exists) {
           $('.friend-list').empty();
@@ -55,7 +78,7 @@ firebase.auth().onAuthStateChanged(function(user) {
           });
           for(var i =0; i<friend_id_li.length;i++){
                    friend_id_li[i].addEventListener('click', function(){
-                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; max-height: 75vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><input style="width: calc(100% - 29px);" id="m"  autocomplete="off" required/><button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button></form>';
+                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; max-height: 83vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><span class="msgInputBox"><input class="messageInput" id="m"  autocomplete="off" required/></span><button class="msgSendBtn">SEND</button></form>';
 
                      //auto scroll code start
 
@@ -121,12 +144,38 @@ firebase.auth().onAuthStateChanged(function(user) {
                         db.collection("roomid").doc(room_id).collection("messages")
                             .onSnapshot(function(querySnapshot) {
                                 $('.chat').empty();
+                                  let senderName = '';
+                                  let sender = '';
                                 querySnapshot.forEach(function(doc) {
-                                  let my_chat_class = 'my_chat';
-                                  if (user.displayName != doc.data().sender){
-                                    my_chat_class = '';
+                                  
+                                  if(doc.data().sender != senderName){
+                                    sender = '<strong class="userInChat">'+ doc.data().sender +'</strong>'
+                                    senderName = doc.data().sender;
+                                  } else {
+                                    sender = '';
+                                  }   
+                                  let dateObj = new Date(parseInt(doc.id));
+                                  //console.log(doc.id);
+                                  //console.log(dateObj);
+                                  let hour = (parseInt(dateObj.getHours())%12).toString().padStart(2, '0');
+                                  let minute = dateObj.getMinutes().toString().padStart(2, '0');
+                                  let duration;
+                                  
+                                  let day = days[dateObj.getDay()];
+                                  let month = months[dateObj.getMonth()];
+                                  let year = dateObj.getFullYear();
+                                  let dayNum = dateObj.getDate();
+
+                                  let fullTime = day +" "+ month +" "+ dayNum +" "+ year;
+
+                                  if(parseInt(dateObj.getHours())/12 == 0){
+                                    duration = " AM";
+                                  } else {
+                                    duration = " PM";
                                   }
-                                    $('.chat').append('<li class='+ my_chat_class +'>' + doc.data().message + '</li>');
+
+                                  let time = hour +":"+ minute + duration;
+                                  $('.chat').append(sender +'<li class="row"><span class="col-sm-9">'+ doc.data().message + '</span><span class="col-sm-3 chatTime" data-toggle="tooltip" data-placement="top" title="'+ fullTime +'">'+ time +'</span></li>');
                                     
                                     
                                 });
@@ -142,7 +191,17 @@ firebase.auth().onAuthStateChanged(function(user) {
       }
      } 
   });
-    
+  
+  //Profile loading
+  let profileBtn = document.getElementById('user-info');
+
+  profileBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    document.getElementById("displayUsername").innerHTML = user.displayName;
+    document.getElementById("displayEmail").innerHTML = user.email;
+  });
+
   //notification logic
     db.collection("friendRequests").where("receiver", "==", userDocId)
       .onSnapshot(function(querySnapshot) {
@@ -279,7 +338,6 @@ function addFrnd(val){
           let sender = doc.data().sender;
           let receiver = doc.data().receiver;
           let roomid = doc.data().roomid;
-          let sender_id = doc.data().sender_id;
 
           //updating friend on receiver side
           db.collection("users").doc(receiver).get()
@@ -366,7 +424,7 @@ loginForm.addEventListener('submit', (e) =>{
         var errorCode = error.code;
         var errorMessage = error.message;
         // ...
-        alert(error.message);
+        renderAlert(error.message);
     });
 });
 
@@ -386,54 +444,54 @@ signupForm.addEventListener('submit', (e) =>{
 
       userNameRef.get().then(function(doc) {
           if (doc.exists) {
-              alert("Username already exist");
+              renderAlert("Username already exist");
           } else {
               // doc.data() will be undefined in this case
-              firebase.auth().createUserWithEmailAndPassword(createEmail, createPassword).then((cred) =>{
-                // Add a new document in collection "users"
-                  db.collection("users").doc(createdn).set({
-                    id: cred.user.email,
-                    username: createdn,
-                    friends: []
-                  })
-                  .then(function() {
-                    //console.log("Document successfully written!");
-                    //update the username of user
-                    cred.user.updateProfile({
-                      displayName: createdn
-                    }).then(function() {
-                      // Update successful.
-                      //console.log("username updated");
-                      //console.log(cred.user.displayName);
-                    }).catch(function(error) {
-                      // An error happened.
+              
+                firebase.auth().createUserWithEmailAndPassword(createEmail, createPassword).then((cred) =>{
+                  // Add a new document in collection "users"
+                    db.collection("users").doc(createdn).set({
+                      id: cred.user.email,
+                      username: createdn,
+                      friends: []
+                    })
+                    .then(function() {
+                      //console.log("Document successfully written!");
+                      //update the username of user
+                      cred.user.updateProfile({
+                        displayName: createdn
+                      }).then(function() {
+                        // Update successful.
+                        //console.log("username updated");
+                        //console.log(cred.user.displayName);
+                      }).catch(function(error) {
+                        // An error happened.
+                      });
+  
+                      signupForm.reset();
+                      //console.log("signedup");
+                    })
+                    .catch(function(error) {
+                      //console.error("Error writing document: ", error);
                     });
-
-                    signupForm.reset();
-                    //console.log("signedup");
-                  })
-                  .catch(function(error) {
-                    //console.error("Error writing document: ", error);
-                  });
-              }).catch(function(error) {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                // ...
-                alert(error.message);
-              });
+                }).catch(function(error) {
+                  // Handle Errors here.
+                  var errorCode = error.code;
+                  var errorMessage = error.message;
+                  // ...
+                  renderAlert(error.message);
+                });
+              
+              
           }
       }).catch(function(error) {
           console.log("Error getting document:", error);
       });
 
     } else {
-      alert("password do not match");
+      renderAlert("password do not match");
     }
 });
-
-
-
 
 //search bar logic
 const seachBar = document.getElementById("searchBar");
@@ -453,7 +511,7 @@ seachBar.addEventListener('submit',(e) =>{
         .then(function(querySnapshot) {
           if(querySnapshot.empty){
             //console.log("no search result");
-            mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><h3 style="text-align: center;"><i class="fa fa-search"></i> no search result</h3></div>';
+            mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><h3 class="noSearchResult"><i class="fa fa-search"></i> no search result</h3></div>';
           } else {
             serachUser(querySnapshot);
           }
@@ -555,3 +613,94 @@ function requestSend(){
       }
     });
 }
+
+//pasword cahnge function
+const changePassForm = document.getElementById("changePass");
+
+changePassForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  let oldPass = document.getElementById("user_old_pass").value;
+  let newPass = document.getElementById("user_new_pass").value;
+  let reNewPass = document.getElementById("user_renew_pass").value;
+
+  
+
+  if(reNewPass == newPass){
+
+    document.getElementById("changePassSpinner").style.display = 'inline-block';
+
+    let user = firebase.auth().currentUser;
+    let credential = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
+
+    user.reauthenticateWithCredential(credential).then(function() {
+      user.updatePassword(newPass).then(function() {
+        // Update successful.
+        //console.log("password updated");
+        changePassForm.reset();
+        document.getElementById("changePassSpinner").style.display = 'none';
+        $("#changePassModal").modal('hide');
+      }).catch(function(error) {
+        document.getElementById("changePassSpinner").style.display = 'none';
+        renderAlert(error.message);
+      });
+    }).catch(function(error) {
+      document.getElementById("changePassSpinner").style.display = 'none';
+      renderAlert(error.message);
+    });
+  } else {
+    document.getElementById("changePassSpinner").style.display = 'none';
+    renderAlert("Password do not match");
+  }
+});
+
+//change email function
+const changeEmailForm = document.getElementById("changeEmail");
+
+changeEmailForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  let newEmail = document.getElementById("user_new_email").value;
+  let userPass = document.getElementById("user_email_pass").value;
+
+  document.getElementById("changeEmailSpinner").style.display = 'inline-block';
+
+    let user = firebase.auth().currentUser;
+    let credential = firebase.auth.EmailAuthProvider.credential(user.email, userPass);
+    
+    user.reauthenticateWithCredential(credential).then(function() {
+      // User re-authenticated.
+      user.updateEmail(newEmail).then(function() {
+        // Update successful.
+        //updating user document
+        db.collection("users").doc(userDocId).update({
+          id: newEmail
+        })
+        .then(function() {
+          //console.log("Document successfully updated!");
+        })
+        .catch(function(error) {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+        });
+
+        //updating UI
+        changeEmailForm.reset();
+        document.getElementById("changeEmailSpinner").style.display = 'None';
+        $("#changeEmailModal").modal('hide');
+
+        $("#emailChangeToast").toast({
+          autohide: true,
+          animation: true,
+          delay: 3000
+        });
+      }).catch(function(error) {
+        // An error happened.
+        document.getElementById("changeEmailSpinner").style.display = 'None';
+        renderAlert(error.message);
+      });
+    }).catch(function(error) {
+      document.getElementById("changeEmailSpinner").style.display = 'None';
+      renderAlert(error.message);
+    });
+});

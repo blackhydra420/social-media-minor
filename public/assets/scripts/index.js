@@ -15,7 +15,8 @@ function loadForm(){
 let ntcPanel = document.getElementById("ntf_panel");
 let ntfButton = document.getElementById("notification");
 
-function load_ntf(){
+ntfButton.addEventListener('click',(e) =>{
+  e.preventDefault();
   console.log("clicked");
   if(ntcPanel.style.display == "none"){
     ntcPanel.style.display = "block";
@@ -25,4 +26,13 @@ function load_ntf(){
   let bell = document.getElementById("bell");
   bell.removeAttribute('class');
   bell.setAttribute('class', 'far fa-bell');
-}
+});
+
+
+//jQuery scripts
+
+$(document).ready(function(){
+  //Tooltip script
+  $('[data-toggle="tooltip"]').tooltip();
+
+});
