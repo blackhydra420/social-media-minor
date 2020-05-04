@@ -19,7 +19,7 @@ body{
     margin: 0;
 }
 .extra_link{
-    color: blueviolet;
+    color: blueviolet!important;
     cursor: pointer;
 }
 .input_field{

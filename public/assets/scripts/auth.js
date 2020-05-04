@@ -22,6 +22,8 @@ function renderAlert(message){
 
   AlertBlur.style.display = 'block';
   AlertBox.style.display = 'block';
+
+  if(!firebase.auth().currentUser.emailVerified) location.reload();
 }
 
 const AlertBtn = document.getElementById('alertButton');
@@ -35,6 +37,8 @@ AlertBtn.addEventListener('click', (e) =>{
 
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
+    userDocId = user.displayName;
+    userEmail = user.email;
     //checking if user's email is verified or not
     if(!user.emailVerified){
       //console.log(user);
@@ -42,6 +46,7 @@ firebase.auth().onAuthStateChanged(function(user) {
       loginContainer.style.display = "none";
       signupContainer.style.display = 'none';
       document.getElementById("vContainer").style.display = "flex";
+      document.getElementById("emailChangeModalFooter").style.display = 'none';
       emailVerification(user);
     }
     else{
@@ -51,9 +56,7 @@ firebase.auth().onAuthStateChanged(function(user) {
       signupContainer.style.display = 'none';
       afterLogin.style.display = "flex";
       
-      userEmail = user.email;
       document.getElementById("user-info").innerHTML = user.displayName;//Setting user name in profile
-      userDocId = user.displayName;
 
       //Friend List
       var friendref = db.collection("users").doc(user.displayName);
@@ -272,6 +275,10 @@ var actionCodeSettings = {
 function emailVerification(user){
   let vButton = document.getElementById("vButton");
   let vText = document.getElementById("vText");
+
+  let vEmail = document.getElementById("userEmail");
+
+  vEmail.innerHTML = userEmail;
 
   vButton.addEventListener('click', (e) =>{
     e.preventDefault();
@@ -624,8 +631,6 @@ changePassForm.addEventListener('submit', (e) => {
   let newPass = document.getElementById("user_new_pass").value;
   let reNewPass = document.getElementById("user_renew_pass").value;
 
-  
-
   if(reNewPass == newPass){
 
     document.getElementById("changePassSpinner").style.display = 'inline-block';
@@ -685,15 +690,11 @@ changeEmailForm.addEventListener('submit', (e) => {
         });
 
         //updating UI
+        document.getElementById("userEmail").innerHTML = user.email;
         changeEmailForm.reset();
         document.getElementById("changeEmailSpinner").style.display = 'None';
         $("#changeEmailModal").modal('hide');
-
-        $("#emailChangeToast").toast({
-          autohide: true,
-          animation: true,
-          delay: 3000
-        });
+        renderAlert("Your email has been updated.");
       }).catch(function(error) {
         // An error happened.
         document.getElementById("changeEmailSpinner").style.display = 'None';

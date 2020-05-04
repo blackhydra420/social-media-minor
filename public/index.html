@@ -67,8 +67,8 @@
      <!-- Email verification tab -->
      <div id="vContainer" class="container-fluid" style="height: 100vh; display: none; flex-direction: column; justify-content: center;">
       <div class="container shadow-lg rounded" style="width: 500px; padding: 20px;">
-        <h5>Please varify your email to login.</h5>
-        <small class="form-text text-muted" id="vText" style="display: none;">Verification email has been sent to your email. If you didn't recieve the email click on resend after <span id="vTimer">1:30</span>.</small><br>
+        <h5>Please verify your email to login.</h5>
+        <small class="form-text text-muted" id="vText" style="display: none;">Verification email has been sent to your email. If you didn't recieve the email click on resend after <span id="vTimer">1:30</span>. <br>If <span id="userEmail" style="color:blue;"></span> isn't your email change it <a class="extra_link" data-toggle="modal" data-target="#changeEmailModal">here</a>.</small><br>
         <button class="btn btn-primary" id="vButton">Verify</button>
       </div>
      </div>
@@ -179,7 +179,7 @@
             </div>
       
             <!-- Modal footer -->
-            <div class="modal-footer">
+            <div class="modal-footer" id="emailChangeModalFooter">
               <button type="button" class="btn btn-danger" data-dismiss="modal" data-toggle="modal" data-target="#userProfile">Back</button>
             </div>
       
@@ -261,7 +261,7 @@
     <div id="alertBlur"></div>
 
     <!-- Toast templates -->
-    <div class="toast" id="emailChangeToast" style="position: absolute; bottom: 20px; right: 20px;">
+    <div class="toast" id="emailChangeToast" style="position: absolute; bottom: 20px; right: 20px; z-index: 99;">
       <div class="toast-header">
           <strong class="mr-auto">Email has changed</strong>
           <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">
