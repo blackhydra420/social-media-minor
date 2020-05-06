@@ -82,7 +82,7 @@ firebase.auth().onAuthStateChanged(function(user) {
           });
           for(var i =0; i<friend_id_li.length;i++){
                    friend_id_li[i].addEventListener('click', function(){
-                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; max-height: 83vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><span class="msgInputBox"><input class="messageInput" id="m"  autocomplete="off" /></span><button class="msgSendBtn">SEND</button></form>';
+                     mainBox.innerHTML =' <div><h4 class="topic-heading" id="current-chatter">Name of the person</h4><span class="addFile" data-toggle="tootip" data-placement="bottom" title="Add file"><i class="fas fa-plus" data-toggle="modal" data-target="#fileUploadingModal"></i></span></div><ul style="list-style: none; max-height: 83vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><span class="msgInputBox"><input class="messageInput" id="m"  autocomplete="off" /></span><button class="msgSendBtn">SEND</button></form>';
 
                      //auto scroll code start
 

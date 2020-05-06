@@ -330,3 +330,14 @@ ul{
     background-color: #252525;
     border-radius: 5px;
 }
+.addFile{
+    position: absolute;
+    color: white;
+    top: 0;
+    right: 10px;
+    height: 58px;
+    padding: 17px 0;
+}
+.addFile:hover{
+    cursor: pointer;
+}
