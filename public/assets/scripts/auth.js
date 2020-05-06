@@ -23,7 +23,6 @@ function renderAlert(message){
   AlertBlur.style.display = 'block';
   AlertBox.style.display = 'block';
 
-  if(!firebase.auth().currentUser.emailVerified) location.reload();
 }
 
 const AlertBtn = document.getElementById('alertButton');
@@ -33,6 +32,8 @@ AlertBtn.addEventListener('click', (e) =>{
 
   AlertBlur.style.display = 'none';
   AlertBox.style.display = 'none';
+
+  if(!firebase.auth().currentUser.emailVerified) location.reload();
 });
 
 firebase.auth().onAuthStateChanged(function(user) {

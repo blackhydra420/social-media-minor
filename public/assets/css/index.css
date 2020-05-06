@@ -324,7 +324,7 @@ ul{
     transform: translate(-50%, -50%)!important;
 }
 ::-webkit-scrollbar{
-    width: 5px;
+    width: 7px;
 }
 ::-webkit-scrollbar-thumb{
     background-color: #252525;
