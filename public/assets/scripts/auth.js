@@ -82,7 +82,7 @@ firebase.auth().onAuthStateChanged(function(user) {
           });
           for(var i =0; i<friend_id_li.length;i++){
                    friend_id_li[i].addEventListener('click', function(){
-                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; max-height: 83vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><span class="msgInputBox"><input class="messageInput" id="m"  autocomplete="off" required/></span><button class="msgSendBtn">SEND</button></form>';
+                     mainBox.innerHTML =' <h4 class="topic-heading" id="current-chatter">Name of the person</h4><ul style="list-style: none; max-height: 83vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><span class="msgInputBox"><input class="messageInput" id="m"  autocomplete="off" /></span><button class="msgSendBtn">SEND</button></form>';
 
                      //auto scroll code start
 
@@ -135,6 +135,7 @@ firebase.auth().onAuthStateChanged(function(user) {
                           //console.log($('#m').val());
                           e.preventDefault();
                         var message_val = $("#m").val();
+                        if(message_val){
                         var sender_id = $("#user-info")[0].innerHTML;
                         var document_id = (Date.now()).toString();
                         //console.log(message_val + '' + sender_id + '' + document_id);  
@@ -142,7 +143,7 @@ firebase.auth().onAuthStateChanged(function(user) {
                         sender: sender_id,
                         message: message_val
                          });
-                        
+                        } else renderAlert("Blank message cannot be sent.");
                          $('#m').val(""); 
                           });
                         db.collection("roomid").doc(room_id).collection("messages")
@@ -706,3 +707,5 @@ changeEmailForm.addEventListener('submit', (e) => {
       renderAlert(error.message);
     });
 });
+
+//File uploading function
