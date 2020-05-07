@@ -82,7 +82,7 @@ firebase.auth().onAuthStateChanged(function(user) {
           });
           for(var i =0; i<friend_id_li.length;i++){
                    friend_id_li[i].addEventListener('click', function(){
-                     mainBox.innerHTML =' <div><h4 class="topic-heading" id="current-chatter">Name of the person</h4><span class="addFile" data-toggle="tootip" data-placement="bottom" title="Add file"><i class="fas fa-plus" data-toggle="modal" data-target="#fileUploadingModal"></i></span></div><ul style="list-style: none; max-height: 83vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><span class="msgInputBox"><input class="messageInput" id="m"  autocomplete="off" /></span><button class="msgSendBtn">SEND</button></form>';
+                     mainBox.innerHTML =' <div><h4 class="topic-heading" id="current-chatter">Name of the person</h4><span class="addFile" data-toggle="tootip" data-placement="bottom" title="Add file"><i class="fas fa-plus" data-toggle="modal" data-target="#fileUploadingModal"></i></span></div><ul style="list-style: none; max-height: 80vh; overflow:auto" class="chat" id="myChat">                         </ul><form class="message-sending"><span class="msgInputBox"><input class="messageInput" id="m"  autocomplete="off" /></span><button class="msgSendBtn">SEND</button></form>';
 
                      //auto scroll code start
 
@@ -136,8 +136,8 @@ firebase.auth().onAuthStateChanged(function(user) {
                           e.preventDefault();
                         var message_val = $("#m").val();
                         if(message_val){
-                        var sender_id = $("#user-info")[0].innerHTML;
-                        var document_id = (Date.now()).toString();
+                        let sender_id = $("#user-info")[0].innerHTML;
+                        let document_id = (Date.now()).toString();
                         //console.log(message_val + '' + sender_id + '' + document_id);  
                         db.collection("roomid").doc(room_id).collection("messages").doc(document_id).set({
                         sender: sender_id,
@@ -709,3 +709,84 @@ changeEmailForm.addEventListener('submit', (e) => {
 });
 
 //File uploading function
+let fileInput = document.getElementById("fileUploadInput");
+const fileUploadForm = document.getElementById("fileUpload");
+let fileList = document.getElementById("fileList");
+
+fileUploadForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  console.log(fileInput.files);
+  let File = fileInput.files[0];
+  let fileName = File.name;
+  let farr = fileName.split(".");
+  let fname = farr[0] + Date.now().toString();
+  let fext = farr[farr.length - 1];
+  fileName = fname + "." + fext;
+  let fileSize = File.size;
+  let fileType = File.type;
+
+  let folder = storage.child(room_id);
+
+  let metaData = {
+    'name':fileName,
+    'size':fileSize,
+    'type':fileType
+  };
+
+  var uploadTask = folder.child(fileName).put(File, metaData);
+
+  let uploadProgress = document.getElementById('uploadProgress');
+  // let progressBar = document.getElementById('progressBar');
+  // progressBar.style.display = 'block';
+  let uploadStatus = document.getElementById('uploadStatus');
+
+  uploadTask.on('state_changed', function(snapshot){
+    
+    // Observe state change events such as progress, pause, and resume
+    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+    var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //console.log('Upload is ' + progress + '% done');
+    uploadProgress.style.width = progress + '%';
+    switch (snapshot.state) {
+      case firebase.storage.TaskState.PAUSED: // or 'paused'
+        //console.log('Upload is paused');
+        uploadStatus.innerHTML = "Upload is paused";
+        break;
+      case firebase.storage.TaskState.RUNNING: // or 'running'
+        //console.log('Upload is running');
+        uploadStatus.innerHTML = "Uploading..."
+        break;
+    }
+    if(progress == 100){
+      // progressBar.style.display = 'none';
+      fileList.innerHTML = '';
+      fileUploadForm.reset();
+      uploadProgress.style.width = 0;
+      uploadStatus.innerHTML = 'File uploaded';
+    }
+  }, function(error) {
+    // Handle unsuccessful uploads
+    renderAlert(error.message);
+  }, function() {
+    // Handle successful uploads on complete
+    // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+    
+    uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+      console.log('File available at', downloadURL);
+      let senderId = $("#user-info")[0].innerHTML;
+      let document_id = Date.now().toString();
+      let message = '<div class="messageLink row"><i class="fas fa-file-download messageIcon col-2" style="color:white;"></i> <a class="col-10" href="'+ downloadURL +'" download>'+ fileName +'</a></div>';
+      db.collection("roomid").doc(room_id).collection("messages").doc(document_id).set({
+        sender: senderId,
+        message: message
+      });
+    });
+  });
+});
+
+fileInput.addEventListener('change', (e) => {
+  e.preventDefault();
+
+  fileList.innerHTML = "</br><strong>File name:</strong> " + fileInput.files[0].name + "</br><strong>Size:</strong> " + fileInput.files[0].size + "Bytes.";
+  
+});

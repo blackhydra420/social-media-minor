@@ -200,12 +200,19 @@
       
             <!-- Modal body -->
             <div class="modal-body">
-              <form id="fileUpload">
+              <form id="fileUpload" method="POST">
                 <div class="form-group">
                   <input type="file" name="fileUploadInput" id="fileUploadInput">
+                  <div id="fileContainer">
+                    <p id="fileList"></p>
+                  </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Upload</button>
-              </form>
+              </form><br> 
+              <p id="uploadStatus"></p>
+              <div class="progress" id="progressBar">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgress" role="progressbar" style="width: 0"></div>
+              </div>
             </div>
       
             <!-- Modal footer -->
@@ -219,13 +226,6 @@
 
     <!-- main chatbox -->
     <div id="after_login">
-      <!-- <div class="logout" style="widows: 50px; height: 50%; margin: 5px; position: absolute; right: 10px; top: 40px;">
-        
-      </div>
-
-      <div class="logout" style="widows: 50px; height: 50%; margin: 5px; position: absolute; right: 10px; top: 90px;">
-        
-      </div> -->
       <div id="chatbox" class="container-fluid">
         <div class="mainNav">
           <img src="assets/images/swlog.png" alt="brand logo" id="brandLogo">

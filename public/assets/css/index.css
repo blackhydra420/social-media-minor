@@ -341,3 +341,20 @@ ul{
 .addFile:hover{
     cursor: pointer;
 }
+#fileList{
+    max-height: 290px;
+    overflow-y: auto;
+}
+.messageLink{
+    color: white;
+    padding: 10px;
+    max-width: 300px;
+    height: auto;
+    background-color: #252525;
+    border-left: 5px solid red;
+    border-radius: 3px;
+    margin: 10px 0;
+}
+.messageIcon{
+    font-size: 45px;
+}
