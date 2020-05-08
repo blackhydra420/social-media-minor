@@ -14,6 +14,9 @@ let signupContainer = document.getElementById("signupContainer");
 let afterLogin = document.getElementById("after_login");
 const mainBox = document.getElementById("main_box");
 
+//preloader
+const preloader = document.getElementById('preloader');
+
 const AlertBlur = document.getElementById('alertBlur');
 const AlertBox = document.getElementById('alertBox');
 
@@ -38,6 +41,7 @@ AlertBtn.addEventListener('click', (e) =>{
 
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
+    preloader.style.display = 'none';
     userDocId = user.displayName;
     userEmail = user.email;
     //checking if user's email is verified or not
@@ -421,6 +425,8 @@ const loginForm = document.getElementById("loginForm");
 loginForm.addEventListener('submit', (e) =>{
     e.preventDefault();
 
+    preloader.style.display = 'block';
+    loginContainer.style.display = 'none';
     const email = document.getElementById("user_email").value;
     const password = document.getElementById("user_pass").value;
 
@@ -433,8 +439,28 @@ loginForm.addEventListener('submit', (e) =>{
         var errorCode = error.code;
         var errorMessage = error.message;
         // ...
+        preloader.style.display = 'none';
+        loginContainer.style.display = 'flex';
         renderAlert(error.message);
     });
+});
+
+//reset password logic
+const resetPassord = document.getElementById('resetPass');
+
+resetPassord.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  let auth = firebase.auth();
+  let emailAddress = document.getElementById('resetEmail').value;
+
+  auth.sendPasswordResetEmail(emailAddress).then(function() {
+    renderAlert("Password reset email has been sent to your email.");
+    $("#resetPassModal").modal('hide');
+    resetPassord.reset();
+  }).catch(function(error) {
+    renderAlert(error.message);
+  });
 });
 
 //signup form logic
@@ -443,6 +469,8 @@ const signupForm = document.getElementById("signupForm");
 signupForm.addEventListener('submit', (e) =>{
     e.preventDefault();
 
+    preloader.style.display = 'block';
+    signupContainer.style.display = 'none';
     const createEmail = document.getElementById("user_create_email").value;
     const createdn = document.getElementById("user_create_dn").value;
     const createPassword = document.getElementById("user_create_pass").value;
@@ -453,6 +481,8 @@ signupForm.addEventListener('submit', (e) =>{
 
       userNameRef.get().then(function(doc) {
           if (doc.exists) {
+              preloader.style.display = 'none';
+              signupContainer.style.display = 'flex';
               renderAlert("Username already exist");
           } else {
               // doc.data() will be undefined in this case
@@ -482,12 +512,16 @@ signupForm.addEventListener('submit', (e) =>{
                     })
                     .catch(function(error) {
                       //console.error("Error writing document: ", error);
+                      preloader.style.display = 'none';
+                      signupContainer.style.display = 'flex';
                     });
                 }).catch(function(error) {
                   // Handle Errors here.
                   var errorCode = error.code;
                   var errorMessage = error.message;
                   // ...
+                  preloader.style.display = 'none';
+                  signupContainer.style.display = 'flex';
                   renderAlert(error.message);
                 });
               
@@ -495,9 +529,13 @@ signupForm.addEventListener('submit', (e) =>{
           }
       }).catch(function(error) {
           console.log("Error getting document:", error);
+          preloader.style.display = 'none';
+          signupContainer.style.display = 'flex';
       });
 
     } else {
+      preloader.style.display = 'none';
+      signupContainer.style.display = 'flex';
       renderAlert("password do not match");
     }
 });
@@ -508,6 +546,8 @@ const seachBar = document.getElementById("searchBar");
 seachBar.addEventListener('submit',(e) =>{
   e.preventDefault();
 
+  preloader.style.display = 'block';
+  afterLogin.style.display = 'none';
   let userSearch = document.getElementById("searchInput").value;
   //console.log(userSearch);
 
@@ -519,6 +559,8 @@ seachBar.addEventListener('submit',(e) =>{
         .get()
         .then(function(querySnapshot) {
           if(querySnapshot.empty){
+            preloader.style.display = 'none';
+            afterLogin.style.display = 'flex';
             //console.log("no search result");
             mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><h3 class="noSearchResult"><i class="fa fa-search"></i> no search result</h3></div>';
           } else {
@@ -526,6 +568,8 @@ seachBar.addEventListener('submit',(e) =>{
           }
         })
         .catch(function(error) {
+            preloader.style.display = 'none';
+            afterLogin.style.display = 'flex';
             //console.log("Error getting documents: ", error);
         });
       } else {
@@ -533,6 +577,8 @@ seachBar.addEventListener('submit',(e) =>{
       }
     })
     .catch(function(error) {
+        preloader.style.display = 'none';
+        afterLogin.style.display = 'flex';
         //console.log("Error getting documents: ", error);
     });
 });
@@ -581,7 +627,8 @@ function serachUser(querySnapshot){
         }
       }
       mainBox.innerHTML = '<h4 class="topic-heading">Result</h4><div class="container" style="display: flex; flex-direction: column; justify-content: center; height: calc(100% - 58px);"><div class="card shadow" style="width: 18rem; margin: auto;"><img src="assets/images/default-profile.png" class="card-img-top" alt="..."><div class="card-body"><h6 class="card-title">Email: '+ doc.data().id +'</h6><h6 class="card-title">Username: '+ doc.data().username +'</h6>'+ buttonText +'</div></div></div>';
-
+      preloader.style.display = 'none';
+      afterLogin.style.display = 'flex';
       if(!isFriend && friendId != userDocId && !isRequested){
         isAbleToSend = true;
         requestSend();
